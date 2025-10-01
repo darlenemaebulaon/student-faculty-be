@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate, authorizeRoles } = require('../middleware/auth');
+const { requireAuth, authorizeRoles } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 const Appointment = require('../models/Appointment');
-const MedicalRecord = require('../models/MedicalRecord');
+const MedicalRecord = require('../models/HealthRecord');
 const Announcement = require('../models/Announcement');
 
 // Route: GET /api/portal/dashboard
-router.get('/dashboard', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.get('/dashboard', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const now = new Date();
     const upcomingAppointments = await Appointment.find({
-      requester: req.user._id,
-      preferredDate: { $gte: now },
+      user: req.user._id,
+      appointmentDate: { $gte: now },
       status: { $in: ['pending','approved'] }
-    }).sort({ preferredDate: 1 }).limit(5);
+    }).sort({ appointmentDate: 1 }).limit(5);
 
     const recentAnnouncements = await Announcement.find().sort({ createdAt: -1 }).limit(5);
 
@@ -36,7 +36,7 @@ router.get('/dashboard', authenticate, authorizeRoles('student','faculty'), asyn
 // Appointments
 // POST /api/portal/appointments
 router.post('/appointments',
-  authenticate,
+  requireAuth,
   authorizeRoles('student','faculty'),
   [
     body('type').isIn(['on-site','online']),
@@ -65,7 +65,7 @@ router.post('/appointments',
 );
 
 // GET /api/portal/appointments
-router.get('/appointments', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.get('/appointments', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const appointments = await Appointment.find({ requester: req.user._id }).sort({ createdAt: -1 });
     res.json(appointments);
@@ -76,7 +76,7 @@ router.get('/appointments', authenticate, authorizeRoles('student','faculty'), a
 });
 
 // GET single appointment
-router.get('/appointments/:id', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.get('/appointments/:id', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const appt = await Appointment.findById(req.params.id);
     if (!appt) return res.status(404).json({ message: 'Appointment not found' });
@@ -89,7 +89,7 @@ router.get('/appointments/:id', authenticate, authorizeRoles('student','faculty'
 });
 
 // Cancel appointment (user)
-router.put('/appointments/:id/cancel', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.put('/appointments/:id/cancel', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const appt = await Appointment.findById(req.params.id);
     if (!appt) return res.status(404).json({ message: 'Appointment not found' });
@@ -107,7 +107,7 @@ router.put('/appointments/:id/cancel', authenticate, authorizeRoles('student','f
 
 // Health records - read-only view of own records
 // GET /api/portal/records
-router.get('/records', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.get('/records', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const records = await MedicalRecord.find({ patient: req.user._id }).sort({ visitDate: -1 });
     res.json(records);
@@ -118,7 +118,7 @@ router.get('/records', authenticate, authorizeRoles('student','faculty'), async 
 });
 
 // GET single record
-router.get('/records/:id', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.get('/records/:id', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const rec = await MedicalRecord.findById(req.params.id);
     if (!rec) return res.status(404).json({ message: 'Record not found' });
@@ -131,7 +131,7 @@ router.get('/records/:id', authenticate, authorizeRoles('student','faculty'), as
 });
 
 // Announcements
-router.get('/announcements', authenticate, authorizeRoles('student','faculty'), async (req,res) => {
+router.get('/announcements', requireAuth, authorizeRoles('student','faculty'), async (req,res) => {
   try {
     const announcements = await Announcement.find().sort({ createdAt: -1 });
     res.json(announcements);

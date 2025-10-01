@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');
 const Announcement = require('../models/Announcement');
-const MedicalRecord = require('../models/MedicalRecord');
+const HealthRecord = require('../models/HealthRecord');
 const Appointment = require('../models/Appointment');
 
 const seed = async () => {
@@ -19,7 +19,7 @@ const seed = async () => {
   // clear
   await User.deleteMany({});
   await Announcement.deleteMany({});
-  await MedicalRecord.deleteMany({});
+  await HealthRecord.deleteMany({});
   await Appointment.deleteMany({});
 
   // create users
@@ -45,19 +45,23 @@ const seed = async () => {
 
   // announcements
   await Announcement.create([
-    { title: 'Flu Vaccination Drive', message: 'Free flu shots on Oct 15 at the clinic. Bring your student ID.', postedBy: 'Clinic Admin' },
-    { title: 'Extended Hours', message: 'Clinic open until 6pm during midterms week.', postedBy: 'Clinic Admin', pinned: true }
+    { title: 'Flu Vaccination Drive', content: 'Free flu shots on Oct 15 at the clinic. Bring your student ID.', createdBy: student._id },
+    { title: 'Extended Hours', content: 'Clinic open until 6pm during midterms week.', createdBy: faculty._id, pinned: true }
   ]);
 
+
   // medical record for student
-  await MedicalRecord.create({
-    patient: student._id,
-    visitDate: new Date('2025-04-10'),
+  await HealthRecord.create({
+  user: student._id,
+  visits: [{
+    date: new Date('2025-04-10'),
+    reason: 'Checkup',
     diagnosis: 'Upper Respiratory Infection',
-    labResults: [{ testName: 'CBC', result: 'Normal', notes: '' }],
-    prescriptions: [{ medicine: 'Paracetamol', dosage: '500 mg', instructions: 'PRN for fever' }],
-    notes: 'Rest, hydration recommended.'
-  });
+    notes: 'Rest, hydration recommended.',
+    prescriptions: [{ name: 'Paracetamol', dose: '500 mg' }],
+    labResults: [{ name: 'CBC', result: 'Normal', date: new Date(), notes: '' }]
+  }]
+});
 
   // sample appointment
   await Appointment.create({

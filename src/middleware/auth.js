@@ -5,7 +5,7 @@ dotenv.config();
 
 const jwtSecret = process.env.JWT_SECRET || 'secret';
 
-exports.authenticate = async (req, res, next) => {
+exports.requireAuth = async (req, res, next) => {
   const authHeader = req.header('Authorization') || req.header('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'No token provided' });

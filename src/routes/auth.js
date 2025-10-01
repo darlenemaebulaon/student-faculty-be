@@ -14,7 +14,7 @@ router.post('/register',
   [
     body('fullName').notEmpty(),
     body('email').isEmail(),
-    body('password').isLength({ min: 6 }),
+    body('password').isLength({ min: 8 }),
     body('role').isIn(['student','faculty']).optional()
   ],
   async (req,res) => {
