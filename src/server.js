@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
+// Import route handlers
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const appointmentRoutes = require('./routes/appointments');
@@ -17,12 +18,10 @@ const feedbackRoutes = require('./routes/feedback');
 const app = express();
 connectDB();
 
+// Middleware 
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-
-//connect DB
-connectDB(process.env.MONGO_URI || 'mongodb+srv://darlenemaebulaon:darlenm04212004@ua-database.yq4y3.mongodb.net/student_faculty_portal?retryWrites=true&w=majority&appName=UA-DATABASE');
 
 //routes
 app.use('/api/auth', authRoutes);

@@ -45,8 +45,17 @@ const seed = async () => {
 
   // announcements
   await Announcement.create([
-    { title: 'Flu Vaccination Drive', content: 'Free flu shots on Oct 15 at the clinic. Bring your student ID.', createdBy: student._id },
-    { title: 'Extended Hours', content: 'Clinic open until 6pm during midterms week.', createdBy: faculty._id, pinned: true }
+    { 
+      title: 'Flu Vaccination Drive', 
+      content: 'Free flu shots on Oct 15 at the clinic. Bring your student ID.', 
+      createdBy: student._id 
+    },
+    { 
+      title: 'Extended Hours', 
+      content: 'Clinic open until 6pm during midterms week.', 
+      createdBy: faculty._id, 
+      pinned: true 
+    }
   ]);
 
 
@@ -58,8 +67,16 @@ const seed = async () => {
     reason: 'Checkup',
     diagnosis: 'Upper Respiratory Infection',
     notes: 'Rest, hydration recommended.',
-    prescriptions: [{ name: 'Paracetamol', dose: '500 mg' }],
-    labResults: [{ name: 'CBC', result: 'Normal', date: new Date(), notes: '' }]
+    prescriptions: [{ 
+      name: 'Paracetamol', 
+      dose: '500 mg' 
+    }],
+    labResults: [{ 
+      name: 'CBC', 
+      result: 'Normal', 
+      date: new Date(), 
+      notes: '' 
+    }]
   }]
 });
 
