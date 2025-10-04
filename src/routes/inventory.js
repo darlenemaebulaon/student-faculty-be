@@ -3,6 +3,7 @@ const router = express.Router();
 const { requireAuth } = require('../middleware/auth');
 const InventoryRequest = require('../models/InventoryRequest');
 const Notification = require('../models/Notification');
+const sendMail = require('../utils/mailer');
 
 // POST /api/portal/inventory (request medicines)
 router.post('/', requireAuth, 
@@ -19,6 +20,13 @@ router.post('/', requireAuth,
       title: 'Inventory request submitted', 
       message: 'Your medicine request has been submitted.' 
     });
+
+    await sendMail(
+      req.user.email,
+      'Inventory Request Submitted',
+      '<p>Your medicine request has been received and is being processed.</p>'
+    );
+
     res.status(201).json(doc);
 
   } catch (err) { 

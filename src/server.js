@@ -21,6 +21,7 @@ connectDB();
 // Middleware 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 //routes
@@ -28,7 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/portal/dashboard', dashboardRoutes);
 app.use('/api/portal/appointments', appointmentRoutes);
 app.use('/api/portal/health-records', healthRoutes);
-app.use('/api/announcements', announcementRoutes);
+app.use('/api/portal/announcements', announcementRoutes);
 app.use('/api/portal/notifications', notificationRoutes);
 app.use('/api/portal/medical-certs', medicalCertRoutes);
 app.use('/api/portal/inventory', inventoryRoutes);

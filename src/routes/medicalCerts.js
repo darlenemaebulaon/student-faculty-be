@@ -3,7 +3,7 @@ const router = express.Router();
 const { requireAuth, authorizeRoles } = require('../middleware/auth');
 const MedicalCertRequest = require('../models/MedicalCertRequest');
 const Notification = require('../models/Notification');
-const { sendMail } = require('../utils/mailer');
+const sendMail = require('../utils/mailer');
 const PDFDocument = require('pdfkit');
 
 // Create request
@@ -24,8 +24,13 @@ router.post('/', requireAuth,
       message: `Your ${reqType} request has been submitted.`
     });
 
-    await sendMail(req.user.email, 'Medical certificate request submitted', `Your ${reqType} request has been submitted.`).catch(e => 
+    await sendMail(
+      req.user.email, 
+      'Medical certificate request submitted', 
+      `Your ${reqType} request has been submitted.`
+    ).catch(e => 
       console.log(e.message));
+
     res.status(201).json(reqDoc);
   } catch (err) { 
     console.error(err); 
@@ -53,7 +58,7 @@ router.get('/', requireAuth,
   }
 });
 
-// --- Admin fills in certificate details ---
+//Admin fills in certificate details
 router.put('/:id/finalize', 
   requireAuth, authorizeRoles('admin'), 
   async (req, res) => {
@@ -105,7 +110,7 @@ router.get('/:id/pdf', requireAuth,
     res.setHeader('Content-Disposition', `inline; filename=medical_certificate_${cert._id}.pdf`);
     doc.pipe(res);
 
-    // --- Certificate Content ---
+    //Certificate Content
     doc.fontSize(12).text(new Date().toLocaleDateString(), { align: 'right' });
     doc.moveDown(2);
 

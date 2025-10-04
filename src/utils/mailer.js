@@ -1,9 +1,11 @@
 const nodemailer = require('nodemailer'); // Library for sending emails
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Create a transporter object using SMTP settings from environment variables
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
+  port: process.env.SMTP_PORT,
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
@@ -12,29 +14,26 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Sends an email using the configured transporter
- * @param {string} to - Recipient email address
- * @param {string} subject - Subject of the email
- * @param {string} text - Plain text body
- * @param {string|null} html - Optional HTML body
+ * Sends an email notification.
+ * @param {string} to - Recipient email
+ * @param {string} subject - Email subject
+ * @param {string} html - HTML message body
  */
 
-async function sendMail(to, subject, text, html = null) {
-  if (!process.env.SMTP_USER) {
-    console.log('SMTP not configured — skipping email:', subject);
-    return;
+exports.sendMail = async (to, subject, html) => {
+  try {
+    await transporter.sendMail({
+      from: process.env.FROM_EMAIL,
+      to,
+      subject,
+      html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">
+              ${html}
+              <hr/>
+              <p style="font-size: 12px; color: #666;">UA Clinic Portal</p>
+             </div>`
+    });
+    console.log(`Email sent to ${to} — ${subject}`);
+  } catch (err) {
+    console.error(`Email error: ${err.message}`);
   }
-
-  // Send the email
-  const info = await transporter.sendMail({
-    from: process.env.FROM_EMAIL,
-    to,
-    subject,
-    text,
-    html
-  });
-
-  console.log('Email sent:', info.messageId); // Log the unique message ID
-}
-
-module.exports = { sendMail };
+};
